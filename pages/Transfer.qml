@@ -375,7 +375,7 @@ Rectangle {
                   }
               }
 
-              LineEditMulti {
+              LineEdit {
                   id: descriptionLine
                   placeholderText: qsTr("Saved to local wallet history") + translationManager.emptyString
                   Layout.fillWidth: true
