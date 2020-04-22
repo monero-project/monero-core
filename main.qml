@@ -1371,7 +1371,7 @@ ApplicationWindow {
         property bool lockOnUserInActivity: true
         property int walletMode: 2
         property int lockOnUserInActivityInterval: 10  // minutes
-        property bool blackTheme: true
+        property bool blackTheme: false
 
         property bool fiatPriceEnabled: false
         property bool fiatPriceToggle: false
