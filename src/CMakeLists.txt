@@ -118,7 +118,6 @@ target_include_directories(monero-wallet-gui PUBLIC
     ${LibUSB_INCLUDE_DIRS}
     ${HIDAPI_INCLUDE_DIRS}
     ${X11_INCLUDE_DIR}
-    ${Boost_INCLUDE_DIRS}
     ${OPENSSL_INCLUDE_DIR}
 )
 
@@ -143,10 +142,8 @@ target_link_libraries(monero-wallet-gui
     wallet_api
     qrcodegen
     easylogging
-    ${Boost_LIBRARIES}
     ${QT5_LIBRARIES}
     ${EXTRA_LIBRARIES}
-    ${ICU_LIBRARIES}
     openpgp
     qrdecoder
     translations
