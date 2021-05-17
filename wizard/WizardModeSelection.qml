@@ -76,12 +76,14 @@ Rectangle {
             }
 
             WizardMenuItem {
-                opacity: appWindow.persistentSettings.nettype == 0 ? 1.0 : 0.5
+                opacity: !isTails && appWindow.persistentSettings.nettype == 0 ? 1.0 : 0.5
                 Layout.topMargin: 20
                 headerText: qsTr("Simple mode") + translationManager.emptyString
                 bodyText: {
-                    if(appWindow.persistentSettings.nettype == 0){
+                    if (!isTails && appWindow.persistentSettings.nettype == 0) {
                         return qsTr("Easy access to sending, receiving and basic functionality.") + translationManager.emptyString;
+                    } else if (isTails) {
+                        return "Not available on Tails.";
                     } else {
                         return "Available on mainnet.";
                     }
@@ -90,7 +92,7 @@ Rectangle {
                 imageIcon: "qrc:///images/remote-node.png"
 
                 onMenuClicked: {
-                    if(appWindow.persistentSettings.nettype == 0){
+                    if (!isTails && appWindow.persistentSettings.nettype == 0) {
                         applyWalletMode(0, 'wizardModeRemoteNodeWarning');
                     }
                 }
@@ -106,11 +108,13 @@ Rectangle {
             }
 
             WizardMenuItem {
-                opacity: appWindow.persistentSettings.nettype == 0 ? 1.0 : 0.5
+                opacity: !isTails && appWindow.persistentSettings.nettype == 0 ? 1.0 : 0.5
                 headerText: qsTr("Simple mode") + " (bootstrap)" + translationManager.emptyString
                 bodyText: {
-                    if(appWindow.persistentSettings.nettype == 0){
+                    if (!isTails && appWindow.persistentSettings.nettype == 0) {
                         return qsTr("Easy access to sending, receiving and basic functionality. The blockchain is downloaded to your computer.") + translationManager.emptyString;
+                    } else if (isTails) {
+                        return "Not available on Tails.";
                     } else {
                         return "Available on mainnet.";
                     }
@@ -118,7 +122,7 @@ Rectangle {
                 imageIcon: "qrc:///images/local-node.png"
 
                 onMenuClicked: {
-                    if(appWindow.persistentSettings.nettype == 0){
+                    if (!isTails && appWindow.persistentSettings.nettype == 0) {
                         appWindow.persistentSettings.pruneBlockchain = true;
                         applyWalletMode(1, 'wizardModeBootstrap');
                     }
