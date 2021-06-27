@@ -208,6 +208,10 @@ public:
     Q_INVOKABLE bool exportKeyImages(const QString& path);
     Q_INVOKABLE bool importKeyImages(const QString& path);
 
+    //! export/import outputs
+    bool exportOutputs(const QString& path, bool all = false);
+    bool importOutputs(const QString& path);
+
     //! refreshes the wallet
     Q_INVOKABLE bool refresh(bool historyAndSubaddresses = true);
 
