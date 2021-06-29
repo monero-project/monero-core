@@ -261,10 +261,20 @@ Rectangle {
                 font.pixelSize: 20
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                width: parent.width
+                anchors.horizontalCenter: parent.horizontalCenter
                 height: parent.height
                 elide: Text.ElideRight
                 text: walletName
+                
+                MouseArea{
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    enabled: blur.visible? false : true
+                    onClicked: {
+                        middlePanel.settingsView.settingsStateViewState = "Wallet";
+                        appWindow.showPageRequest("Settings");
+                    }
+                }
             }
         }
 
