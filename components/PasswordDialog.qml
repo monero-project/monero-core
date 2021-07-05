@@ -71,7 +71,7 @@ Item {
         leftPanel.enabled = false
         middlePanel.enabled = false
         wizard.enabled = false
-        titleBar.state = "essentials"
+        titleBar.state = "default"
         root.visible = true;
         appWindow.hideBalanceForced = true;
         appWindow.updateBalance();

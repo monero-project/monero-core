@@ -1091,6 +1091,7 @@ ApplicationWindow {
     // close wallet and show wizard
     function showWizard(){
         walletInitialized = false;
+        passwordDialog.close();
         closeWallet(function() {
             wizard.restart();
             wizard.wizardState = "wizardHome";
