@@ -117,8 +117,8 @@ RUN wget -q https://downloads.sourceforge.net/project/boost/boost/${BOOST_VERSIO
     install -j${THREADS} \
     && rm -rf $(pwd)
 
-ARG OPENSSL_VERSION=1.1.1g
-ARG OPENSSL_HASH=ddb04774f1e32f0c49751e21b67216ac87852ceb056b75209af2443400636d46
+ARG OPENSSL_VERSION=1.1.1i
+ARG OPENSSL_HASH=e8be6a35fe41d10603c3cc635e93289ed00bf34b79671a3a4de64fcee00d5242
 RUN wget -q https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz \
     && tar -xzf openssl-${OPENSSL_VERSION}.tar.gz \
     && rm openssl-${OPENSSL_VERSION}.tar.gz \
@@ -132,8 +132,8 @@ RUN wget -q https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz \
     && make -j${THREADS} install \
     && rm -rf $(pwd)
 
-ARG ZMQ_VERSION=v4.3.3
-ARG ZMQ_HASH=04f5bbedee58c538934374dc45182d8fc5926fa3
+ARG ZMQ_VERSION=v4.3.4
+ARG ZMQ_HASH=4097855ddaaa65ed7b5e8cb86d143842a594eebd
 RUN git clone https://github.com/zeromq/libzmq.git -b ${ZMQ_VERSION} --depth 1 \
     && cd libzmq \
     && git checkout ${ZMQ_HASH} \
@@ -155,18 +155,18 @@ RUN set -ex \
     && make -j${THREADS} install \
     && rm -rf $(pwd)
 
-RUN git clone -b libgpg-error-1.38 --depth 1 git://git.gnupg.org/libgpg-error.git \
+RUN git clone -b libgpg-error-1.41 --depth 1 git://git.gnupg.org/libgpg-error.git \
     && cd libgpg-error \
-    && git reset --hard 71d278824c5fe61865f7927a2ed1aa3115f9e439 \
+    && git reset --hard 98032624ae89a67ee6fe3b1db5d95032e681d163 \
     && ./autogen.sh \
     && CC=${ANDROID_CLANG} CXX=${ANDROID_CLANGPP} ./configure --host=aarch64-linux-android --prefix=${PREFIX} --disable-rpath --disable-shared --enable-static --disable-doc --disable-tests \
     && PATH=${TOOLCHAIN_DIR}/bin:${HOST_PATH} make -j${THREADS} \
     && make -j${THREADS} install \
     && rm -rf $(pwd)
 
-RUN git clone -b libgcrypt-1.8.5 --depth 1 git://git.gnupg.org/libgcrypt.git \
+RUN git clone -b libgcrypt-1.8.8 --depth 1 git://git.gnupg.org/libgcrypt.git \
     && cd libgcrypt \
-    && git reset --hard 56606331bc2a80536db9fc11ad53695126007298 \
+    && git reset --hard d3d4803ca1b1d50fdb0c8fa2891c75e0229ff25f \
     && ./autogen.sh \
     && CC=${ANDROID_CLANG} CXX=${ANDROID_CLANGPP} ./configure --host=aarch64-linux-android --prefix=${PREFIX} --with-gpg-error-prefix=${PREFIX} --disable-shared --enable-static --disable-doc --disable-tests \
     && PATH=${TOOLCHAIN_DIR}/bin:${HOST_PATH} make -j${THREADS} \
