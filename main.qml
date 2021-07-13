@@ -294,6 +294,8 @@ ApplicationWindow {
 
         appWindow.walletName = "";
         currentWallet = undefined;
+        daemonSynced = false;
+        walletSynced = false;
 
         appWindow.showProcessingSplash(qsTr("Closing wallet..."));
         if (callback) {
