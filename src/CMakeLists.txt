@@ -103,7 +103,6 @@ target_include_directories(monero-wallet-gui PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/zxcvbn-c
     ${X11_INCLUDE_DIR}
     ${Boost_INCLUDE_DIRS}
-    ${OPENSSL_INCLUDE_DIR}
 )
 
 target_compile_definitions(monero-wallet-gui
