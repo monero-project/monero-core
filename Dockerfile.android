@@ -1,10 +1,10 @@
-FROM debian:stretch
+FROM debian:buster
 
 ARG THREADS=1
-ARG ANDROID_NDK_REVISION=21d
-ARG ANDROID_NDK_HASH=bcf4023eb8cb6976a4c7cff0a8a8f145f162bf4d
-ARG ANDROID_SDK_REVISION=4333796
-ARG ANDROID_SDK_HASH=92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9
+ARG ANDROID_NDK_REVISION=21e
+ARG ANDROID_NDK_HASH=c3ebc83c96a4d7f539bd72c241b2be9dcd29bda9
+ARG ANDROID_SDK_REVISION=7302050_latest
+ARG ANDROID_SDK_HASH=7a00faadc0864f78edd8f4908a629a46d622375cbe2e5814e82934aebecdb622
 ARG QT_VERSION=5.15.2
 
 WORKDIR /opt/android
@@ -15,27 +15,30 @@ ENV ANDROID_API=android-${ANDROID_NATIVE_API_LEVEL}
 ENV ANDROID_CLANG=aarch64-linux-android${ANDROID_NATIVE_API_LEVEL}-clang
 ENV ANDROID_CLANGPP=aarch64-linux-android${ANDROID_NATIVE_API_LEVEL}-clang++
 ENV ANDROID_NDK_ROOT=${WORKDIR}/android-ndk-r${ANDROID_NDK_REVISION}
-ENV ANDROID_SDK_ROOT=${WORKDIR}/tools
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV ANDROID_SDK_ROOT=${WORKDIR}/cmdline-tools
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 ENV PATH=${JAVA_HOME}/bin:${PATH}
 ENV PREFIX=${WORKDIR}/prefix
 ENV TOOLCHAIN_DIR=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/linux-x86_64
 
 RUN apt-get update \
     && apt-get install -y ant automake build-essential ca-certificates-java file gettext git libc6 libncurses5 \
-    libssl-dev libstdc++6 libtinfo5 libtool libz1 openjdk-8-jdk-headless openjdk-8-jre-headless pkg-config python3 \
+    libssl-dev libstdc++6 libtinfo5 libtool libz1 openjdk-11-jdk-headless openjdk-11-jre-headless pkg-config python3 \
     unzip wget
 
-RUN wget -q https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_REVISION}.zip \
-    && unzip -q sdk-tools-linux-${ANDROID_SDK_REVISION}.zip \
-    && rm -f sdk-tools-linux-${ANDROID_SDK_REVISION}.zip
+RUN PACKAGE_NAME=commandlinetools-linux-${ANDROID_SDK_REVISION}.zip \
+    && wget -q https://dl.google.com/android/repository/${PACKAGE_NAME} \
+    && echo "${ANDROID_SDK_HASH}  ${PACKAGE_NAME}" | sha256sum -c \
+    && unzip -q ${PACKAGE_NAME} \
+    && rm -f ${PACKAGE_NAME}
 
-RUN wget -q https://dl.google.com/android/repository/android-ndk-r${ANDROID_NDK_REVISION}-linux-x86_64.zip \
-    && unzip -q android-ndk-r${ANDROID_NDK_REVISION}-linux-x86_64.zip \
-    && rm -f android-ndk-r${ANDROID_NDK_REVISION}-linux-x86_64.zip
+RUN PACKAGE_NAME=android-ndk-r${ANDROID_NDK_REVISION}-linux-x86_64.zip \
+    && wget -q https://dl.google.com/android/repository/${PACKAGE_NAME} \
+    && echo "${ANDROID_NDK_HASH}  ${PACKAGE_NAME}" | sha1sum -c \
+    && unzip -q ${PACKAGE_NAME} \
+    && rm -f ${PACKAGE_NAME}
 
-RUN cd ${ANDROID_SDK_ROOT} && echo y | ./bin/sdkmanager "platform-tools" "platforms;${ANDROID_API}" "tools" > /dev/null
-RUN cp -r ${WORKDIR}/platforms ${WORKDIR}/platform-tools ${ANDROID_SDK_ROOT}
+RUN echo y | ${ANDROID_SDK_ROOT}/bin/sdkmanager --sdk_root=${ANDROID_SDK_ROOT} "platform-tools" "platforms;${ANDROID_API}" "tools" > /dev/null
 
 ENV HOST_PATH=${PATH}
 ENV PATH=${TOOLCHAIN_DIR}/aarch64-linux-android/bin:${TOOLCHAIN_DIR}/bin:${PATH}
@@ -114,8 +117,8 @@ RUN wget -q https://downloads.sourceforge.net/project/boost/boost/${BOOST_VERSIO
     install -j${THREADS} \
     && rm -rf $(pwd)
 
-ARG OPENSSL_VERSION=1.1.1g
-ARG OPENSSL_HASH=ddb04774f1e32f0c49751e21b67216ac87852ceb056b75209af2443400636d46
+ARG OPENSSL_VERSION=1.1.1i
+ARG OPENSSL_HASH=e8be6a35fe41d10603c3cc635e93289ed00bf34b79671a3a4de64fcee00d5242
 RUN wget -q https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz \
     && tar -xzf openssl-${OPENSSL_VERSION}.tar.gz \
     && rm openssl-${OPENSSL_VERSION}.tar.gz \
@@ -129,8 +132,8 @@ RUN wget -q https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz \
     && make -j${THREADS} install \
     && rm -rf $(pwd)
 
-ARG ZMQ_VERSION=v4.3.3
-ARG ZMQ_HASH=04f5bbedee58c538934374dc45182d8fc5926fa3
+ARG ZMQ_VERSION=v4.3.4
+ARG ZMQ_HASH=4097855ddaaa65ed7b5e8cb86d143842a594eebd
 RUN git clone https://github.com/zeromq/libzmq.git -b ${ZMQ_VERSION} --depth 1 \
     && cd libzmq \
     && git checkout ${ZMQ_HASH} \
@@ -152,29 +155,25 @@ RUN set -ex \
     && make -j${THREADS} install \
     && rm -rf $(pwd)
 
-RUN git clone -b libgpg-error-1.38 --depth 1 git://git.gnupg.org/libgpg-error.git \
+RUN git clone -b libgpg-error-1.41 --depth 1 git://git.gnupg.org/libgpg-error.git \
     && cd libgpg-error \
-    && git reset --hard 71d278824c5fe61865f7927a2ed1aa3115f9e439 \
+    && git reset --hard 98032624ae89a67ee6fe3b1db5d95032e681d163 \
     && ./autogen.sh \
     && CC=${ANDROID_CLANG} CXX=${ANDROID_CLANGPP} ./configure --host=aarch64-linux-android --prefix=${PREFIX} --disable-rpath --disable-shared --enable-static --disable-doc --disable-tests \
     && PATH=${TOOLCHAIN_DIR}/bin:${HOST_PATH} make -j${THREADS} \
     && make -j${THREADS} install \
     && rm -rf $(pwd)
 
-RUN git clone -b libgcrypt-1.8.5 --depth 1 git://git.gnupg.org/libgcrypt.git \
+RUN git clone -b libgcrypt-1.8.8 --depth 1 git://git.gnupg.org/libgcrypt.git \
     && cd libgcrypt \
-    && git reset --hard 56606331bc2a80536db9fc11ad53695126007298 \
+    && git reset --hard d3d4803ca1b1d50fdb0c8fa2891c75e0229ff25f \
     && ./autogen.sh \
     && CC=${ANDROID_CLANG} CXX=${ANDROID_CLANGPP} ./configure --host=aarch64-linux-android --prefix=${PREFIX} --with-gpg-error-prefix=${PREFIX} --disable-shared --enable-static --disable-doc --disable-tests \
     && PATH=${TOOLCHAIN_DIR}/bin:${HOST_PATH} make -j${THREADS} \
     && make -j${THREADS} install \
     && rm -rf $(pwd)
 
-RUN cd tools \
-    && wget -q http://dl-ssl.google.com/android/repository/tools_r25.2.5-linux.zip \
-    && unzip -q tools_r25.2.5-linux.zip \
-    && rm -f tools_r25.2.5-linux.zip \
-    && echo y | ${ANDROID_SDK_ROOT}/tools/android update sdk --no-ui --all --filter build-tools-28.0.3
+RUN echo y | ${ANDROID_SDK_ROOT}/bin/sdkmanager --sdk_root=${ANDROID_SDK_ROOT} --install "build-tools;28.0.3"
 
 RUN git clone -b v3.19.7 --depth 1 https://github.com/Kitware/CMake \
     && cd CMake \
@@ -200,6 +199,7 @@ CMD set -ex \
     -DBoost_USE_STATIC_RUNTIME=ON \
     -DLRELEASE_PATH="${PREFIX}/bin" \
     -DQT_ANDROID_APPLICATION_BINARY="monero-wallet-gui" \
+    -DANDROID_SDK="${ANDROID_SDK_ROOT}" \
     -DWITH_SCANNER=ON \
     ../../.. \
     && PATH=${HOST_PATH} make generate_translations_header \
